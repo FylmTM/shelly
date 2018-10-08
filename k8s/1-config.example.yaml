@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: shelly
+  name: shelly-config
+data:
+  shelly-slack-token: abc123
+  shelly-config.js: |
+    module.exports = {
+    };

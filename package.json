@@ -1,0 +1,29 @@
+{
+  "name": "shelly",
+  "version": "1.0.0",
+  "private": true,
+  "engine": {
+    "node": "10.11.0"
+  },
+  "dependencies": {
+    "botkit": "0.6.16",
+    "commander": "2.18.0",
+    "dotenv": "6.0.0",
+    "string-argv": "0.1.1"
+  },
+  "devDependencies": {
+    "cross-env": "5.2.0",
+    "husky": "1.1.1",
+    "prettier": "1.14.3",
+    "pretty-quick": "1.7.0"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "lint": "prettier --write \"src/**/*.js\" \"src/**/*.jsx\"",
+    "precommit": "pretty-quick --staged"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "singleQuote": true
+  }
+}

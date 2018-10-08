@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: shelly
+  name: shelly
+  labels:
+    app: shelly
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shelly
+  template:
+    metadata:
+      labels:
+        app: shelly
+    spec:
+      containers:
+      - image: fylmtm/shelly:0.1.0
+        name: shelly
+        env:
+          - name: SLACK_TOKEN
+            valueFrom:
+              configMapKeyRef:
+                name: shelly-config
+                key: shelly-slack-token
+          - name: CONFIG
+            value: /app/shelly-config.js
+        volumeMounts:
+          - name: shelly-config
+            mountPath: /app/shelly-config.js
+            subPath: shelly-config.js
+      volumes:
+        - name: shelly-config
+          configMap:
+            name: shelly-config
