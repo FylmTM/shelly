@@ -19,11 +19,15 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "lint": "prettier --write \"src/**/*.js\" \"src/**/*.jsx\"",
-    "precommit": "pretty-quick --staged"
+    "lint": "prettier --write \"src/**/*.js\" \"src/**/*.jsx\""
   },
   "prettier": {
     "trailingComma": "es5",
     "singleQuote": true
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }
