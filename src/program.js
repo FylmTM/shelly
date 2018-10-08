@@ -2,7 +2,7 @@ const Command = require('commander').Command;
 const version = require('../package.json').version;
 const errorExit = require('./util/errorExit');
 
-const test = require('./commands/test');
+const sprintTest = require('./commands/sprint-status');
 
 const program = new Command('@shelly');
 
@@ -25,8 +25,8 @@ program.on('command:*', function() {
 });
 
 program
-  .command('test <arg>')
-  .description('Test Action')
-  .action(test);
+  .command('sprint-status')
+  .description('Show current JIRA Sprint status')
+  .action(sprintTest);
 
 program.parse(process.argv);

@@ -1,12 +1,12 @@
 const config = require('../config');
 const errorExit = require('../util/errorExit');
 
-module.exports = arg => {
+module.exports = () => {
   console.log(
     JSON.stringify({
       attachments: [
         {
-          text: 'Response from test! Arg: ' + arg,
+          text: 'Empty sprint status',
           color: '#0d8050',
         },
       ],
