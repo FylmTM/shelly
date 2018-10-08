@@ -1,0 +1,10 @@
+sudo: required
+language: bash
+services:
+  - docker
+deploy:
+  provider: script
+  script: bash bin/docker-push.sh
+  on:
+    branch: master
+    tags: true
