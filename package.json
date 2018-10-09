@@ -7,8 +7,8 @@
   },
   "dependencies": {
     "botkit": "0.6.16",
-    "commander": "2.18.0",
     "dotenv": "6.0.0",
+    "minimist": "1.2.0",
     "string-argv": "0.1.1"
   },
   "devDependencies": {

@@ -1,5 +1,4 @@
-const getNodeExecutablePath = require('./util/getNodeExecutablePath');
-const executeCommand = require('./util/executeCommand');
+const program = require('./program');
 
 function shelly(bot, message) {
   console.log(`Message received: ${message.text}`);
@@ -16,26 +15,11 @@ function shelly(bot, message) {
     (error, src, updateResponse) => {
       if (error) console.error(error);
 
-      executeCommand(
-        `${getNodeExecutablePath()} src/program.js ${message.text}`
-      )
+      program
+        .execute(message.text)
         .then(result => {
-          console.log(`Message response: ${result}`);
-
-          let responseMessage;
-          try {
-            responseMessage = JSON.parse(result);
-          } catch {
-            responseMessage = {
-              attachments: [
-                {
-                  text: '```' + result.trim() + '```',
-                  color: '#0d8050',
-                },
-              ],
-            };
-          }
-          updateResponse(responseMessage, err => {
+          console.log('Message response:', result);
+          updateResponse(result, err => {
             if (err) {
               console.error('Failed to update response', err);
             }
@@ -47,10 +31,7 @@ function shelly(bot, message) {
             {
               attachments: [
                 {
-                  text:
-                    '```' +
-                    `${error.stdout.trim() + error.stderr.trim()}` +
-                    '```',
+                  text: error.toString(),
                   color: '#c23030',
                 },
               ],
