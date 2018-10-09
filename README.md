@@ -2,8 +2,30 @@
 
 Your team helper!
 
-TODO:
+## Features
 
-* Feature list
-* How to run as Docker container
-* How to run in Kubernetes
+- JIRA
+  - [ ] Sprint status
+    - [ ] Progress
+    - [ ] Remaining days
+    - [ ] Burndown chart
+    - [ ] Blocked stories
+    - [ ] Stories in progress
+  - [ ] Bug status
+- Jenkins
+  - [ ] Notify about failed build
+- Gerrit
+  - [ ] Notify about pending reviews
+  - [ ] Notify about review new +1/-1
+
+## Quickstart
+
+```bash
+docker run -e SLACK_TOKEN="ac123" -v /localPath/app-config.js:/app/shelly-config.js fylmtm/shelly:0.1.1
+```
+
+## Configuration
+
+```javascript
+module.exports = {};
+```

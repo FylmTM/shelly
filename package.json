@@ -1,6 +1,6 @@
 {
   "name": "shelly",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "private": true,
   "engine": {
     "node": "10.11.0"
