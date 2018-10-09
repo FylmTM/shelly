@@ -6,7 +6,7 @@ const errorMessage = text => ({
   attachments: [
     {
       text,
-      color: exports,
+      color: COLOR_ERROR,
     },
   ],
 });

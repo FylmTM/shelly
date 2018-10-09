@@ -5,3 +5,4 @@ node_modules/
 *.iws
 *.iml
 *.ipr
+dev.js

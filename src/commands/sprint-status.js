@@ -1,16 +1,8 @@
 const config = require('../config');
 const slack = require('../slack');
 const JiraApi = require('jira-client');
+const util = require('util');
 
-/**
- * - Points done: 5/20 (20%)
- * - Days left: 4 (20%)
- * - Burndown chart
- * - Blocked stories
- * - Stories in progress
- *  - ID, Title, Assignee
- * - People without stories
- */
 module.exports = async (args, options, { sourceMessage }) => {
   const channel = sourceMessage.channel;
   if (!channel) {
@@ -34,47 +26,105 @@ module.exports = async (args, options, { sourceMessage }) => {
     return slack.errorMessage('JIRA board is not configured for this channel.');
   }
 
+  const serviceName = channelJiraConfiguration['service'];
+  if (!serviceName) {
+    return slack.errorMessage(
+      'JIRA service name is not configured for this channel.'
+    );
+  }
+
+  const jiraService = config.services.jira.find(
+    service => service.name === serviceName
+  );
+  if (!jiraService) {
+    return slack.errorMessage(
+      `JIRA service [${serviceName}] is not configured for Shelly.`
+    );
+  }
+
+  const jiraApi = new JiraApi(jiraService.clientConfiguration);
+
+  const sprint = await jiraApi.getLastSprintForRapidView(jiraBoardId);
+  if (!sprint || sprint.state !== 'ACTIVE') {
+    return slack.errorMessage('There are no active sprint.');
+  }
+
+  const sprintIssues = await jiraApi.getSprintIssues(jiraBoardId, sprint.id);
+
+  const sprintName = sprint.name;
+  const daysRemaining = sprintIssues.sprint.daysRemaining;
+  const allIssuesEstimateSum = sprintIssues.contents.allIssuesEstimateSum.value;
+  const completedIssuesInitialEstimateSum =
+    sprintIssues.contents.completedIssuesInitialEstimateSum.value;
+  const estimateProgress = Math.round(
+    (completedIssuesInitialEstimateSum / allIssuesEstimateSum) * 100
+  );
+  const issuesInProgress = sprintIssues.contents.issuesNotCompletedInCurrentSprint.filter(
+    issue => {
+      return issue.status.name !== 'Open' && issue.status.name !== 'Blocked';
+    }
+  );
+  const issuesBlocked = sprintIssues.contents.issuesNotCompletedInCurrentSprint.filter(
+    issue => issue.status.name === 'Blocked'
+  );
+
+  function issueToString(issue) {
+    return `<${util.format(
+      channelJiraConfiguration.linkTemplates.issue,
+      issue.key
+    )}|${issue.key}> - ${issue.summary} (:computer: ${issue.assigneeName})`;
+  }
+
   return {
     attachments: [
       {
-        title: 'Team A Sprint 2 ' + jiraBoardId,
-        title_link: 'https://example.com/',
+        title: sprintName,
+        title_link: util.format(
+          channelJiraConfiguration.linkTemplates.board,
+          jiraBoardId
+        ),
         color: slack.COLOR_INFO,
         fields: [
           {
             title: 'Points done',
-            value: '5/20 (20%)',
+            value: `${completedIssuesInitialEstimateSum}/${allIssuesEstimateSum} (${estimateProgress}%)`,
             short: true,
           },
           {
             title: 'Days left',
-            value: '4 (40%)',
+            value: daysRemaining,
             short: true,
           },
         ],
       },
-      {
+      /*{
         title: 'Burdown',
         title_link: 'https://example.com/',
         color: slack.COLOR_INFO,
         image_url:
           'https://luis-goncalves.com/content/uploads/2017/04/chart1.png',
-      },
+      },*/
       {
         title: 'Blocked Stories',
-        title_link: 'https://example.com/',
         color: slack.COLOR_ERROR,
-        text: `
-          <http://example.com|PROJ-2 (Subsystem A task 2)>
-          `.trim(),
+        text:
+          issuesBlocked.length === 0
+            ? 'No blocked stories! :tada:'
+            : issuesBlocked
+                .map(issueToString)
+                .join('\n')
+                .trim(),
       },
       {
         title: 'Stories in progress',
-        title_link: 'https://example.com/',
         color: slack.COLOR_SUCCESS,
-        text: `
-          <http://example.com|PROJ-1 (Subsystem A task 1)> (:male-technologist: Dmitry Vrublevsky)
-          `.trim(),
+        text:
+          issuesInProgress.length === 0
+            ? 'No stories in progress. :thinking_face:'
+            : issuesInProgress
+                .map(issueToString)
+                .join('\n')
+                .trim(),
       },
     ],
   };

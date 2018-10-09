@@ -7,11 +7,11 @@ manage their work.
 
 - JIRA
   - [ ] Sprint status
-    - [ ] Progress
-    - [ ] Remaining days
+    - [x] Progress
+    - [x] Remaining days
     - [ ] Burndown chart
-    - [ ] Blocked stories
-    - [ ] Stories in progress
+    - [x] Blocked stories
+    - [x] Stories in progress
   - [ ] Bug status
 - Jenkins
   - [ ] Notify about failed build
@@ -46,10 +46,13 @@ module.exports = {
   },
   channels: {
     C11111111: {
-      name: 'channel-name',
       jira: {
         service: 'jira',
         boardId: 123,
+        linkTemplates: {
+          board: 'https://jira.example.com/secure/RapidBoard.jspa?rapidView=%s',
+          issue: 'https://jira.example.com/browse/%s',
+        },
       },
     },
   },
