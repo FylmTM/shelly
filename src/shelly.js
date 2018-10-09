@@ -16,7 +16,9 @@ function shelly(bot, message) {
       if (error) console.error(error);
 
       program
-        .execute(message.text)
+        .execute(message.text, {
+          sourceMessage: src,
+        })
         .then(result => {
           console.log('Message response:', result);
           updateResponse(result, err => {

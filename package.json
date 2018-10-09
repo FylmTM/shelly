@@ -8,6 +8,7 @@
   "dependencies": {
     "botkit": "0.6.16",
     "dotenv": "6.0.0",
+    "jira-client": "6.4.1",
     "minimist": "1.2.0",
     "string-argv": "0.1.1"
   },

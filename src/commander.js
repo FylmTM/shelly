@@ -6,7 +6,7 @@ class Commander {
     this.configuration = configuration;
     this.helpCommandConfiguration = {
       command: 'help',
-      action: (args, options) => {
+      action: (args, options, context) => {
         return {
           attachments: [
             {
@@ -19,7 +19,7 @@ class Commander {
     };
   }
 
-  async execute(commandString) {
+  async execute(commandString, context) {
     const argv = stringArgv(commandString, 'node', 'program.js');
     const result = minimist(argv.slice(2));
 
@@ -37,7 +37,11 @@ class Commander {
       commandConfiguration = this.helpCommandConfiguration;
     }
 
-    return await commandConfiguration.action(commandArguments, commandOptions);
+    return await commandConfiguration.action(
+      commandArguments,
+      commandOptions,
+      context
+    );
   }
 }
 

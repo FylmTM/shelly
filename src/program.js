@@ -1,4 +1,4 @@
-const commander = require('./util/commander');
+const commander = require('./commander');
 
 const sprintStatus = require('./commands/sprint-status');
 
