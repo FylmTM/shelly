@@ -21,7 +21,7 @@ Your team helper!
 ## Quickstart
 
 ```bash
-docker run -e SLACK_TOKEN="ac123" -v /localPath/app-config.js:/app/shelly-config.js fylmtm/shelly:0.1.1
+docker run -e SLACK_TOKEN="ac123" -v /localPath/app-config.js:/app/shelly-config.js fylmtm/shelly:0.1.2
 ```
 
 ## Configuration
