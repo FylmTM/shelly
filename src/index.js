@@ -17,6 +17,7 @@ bot.startRTM(function(err, bot, payload) {
 
 controller.on('direct_message', shelly);
 controller.on('direct_mention', shelly);
+controller.on('mention', shelly);
 
 controller.on('rtm_close', () => {
   console.log('RTM Connection closed, exit: 1.');

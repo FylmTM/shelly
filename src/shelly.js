@@ -2,6 +2,17 @@ const program = require('./program');
 
 function shelly(bot, message) {
   console.log(`Message received: ${message.text}`);
+
+  let messageText = message.text;
+  if (messageText.startsWith('Reminder: ')) {
+    messageText = messageText.substring(
+      messageText.indexOf('$') + 1,
+      messageText.lastIndexOf('$')
+    );
+  }
+
+  console.log(`Message received (normalized): ${messageText}`);
+
   bot.replyAndUpdate(
     message,
     {
@@ -16,7 +27,7 @@ function shelly(bot, message) {
       if (error) console.error(error);
 
       program
-        .execute(message.text, {
+        .execute(messageText, {
           sourceMessage: src,
         })
         .then(result => {
