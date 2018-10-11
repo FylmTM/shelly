@@ -1,7 +1,7 @@
 const config = require('../config');
 const slack = require('../slack');
 const businessDays = require('../businessDays');
-const { startOfToday } = require('date-fns');
+const { startOfToday, distanceInWordsStrict, parse } = require('date-fns');
 const JiraApi = require('jira-client');
 const util = require('util');
 
@@ -72,10 +72,19 @@ module.exports = async (args, options, { sourceMessage }) => {
           (completedIssuesInitialEstimateSum / allIssuesEstimateSum) * 100
         )
       : 0;
-  const issuesInProgress = sprintIssues.contents.issuesNotCompletedInCurrentSprint.filter(
-    issue => {
-      return issue.status.name !== 'Open' && issue.status.name !== 'Blocked';
-    }
+  const issuesInProgress = await Promise.all(
+    sprintIssues.contents.issuesNotCompletedInCurrentSprint
+      .filter(issue => {
+        return issue.status.name !== 'Open' && issue.status.name !== 'Blocked';
+      })
+      .map(issue =>
+        jiraApi
+          .findIssue(issue.key)
+          .then(issueExpand => ({
+            ...issue,
+            updated: issueExpand.fields.updated,
+          }))
+      )
   );
   const issuesBlocked = sprintIssues.contents.issuesNotCompletedInCurrentSprint.filter(
     issue => issue.status.name === 'Blocked'
@@ -94,7 +103,12 @@ module.exports = async (args, options, { sourceMessage }) => {
     return `<${util.format(
       channelJiraConfiguration.linkTemplates.issue,
       issue.key
-    )}|${issue.key}> - ${issue.summary} (:computer: ${issue.assigneeName})`;
+    )}|${issue.key}> - ${issue.summary} (:computer: ${
+      issue.assigneeName
+    }) (:arrow_up: ${distanceInWordsStrict(
+      parse(issue.updated),
+      Date.now()
+    )} ago)`;
   }
 
   return {
