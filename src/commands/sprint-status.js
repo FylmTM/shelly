@@ -1,5 +1,7 @@
 const config = require('../config');
 const slack = require('../slack');
+const businessDays = require('../businessDays');
+const { startOfToday } = require('date-fns');
 const JiraApi = require('jira-client');
 const util = require('util');
 
@@ -52,13 +54,24 @@ module.exports = async (args, options, { sourceMessage }) => {
   const sprintIssues = await jiraApi.getSprintIssues(jiraBoardId, sprint.id);
 
   const sprintName = sprint.name;
-  const daysRemaining = sprintIssues.sprint.daysRemaining;
-  const allIssuesEstimateSum = sprintIssues.contents.allIssuesEstimateSum.value;
-  const completedIssuesInitialEstimateSum =
-    sprintIssues.contents.completedIssuesInitialEstimateSum.value;
-  const estimateProgress = Math.round(
-    (completedIssuesInitialEstimateSum / allIssuesEstimateSum) * 100
+  const totalDays = businessDays(
+    sprintIssues.sprint.startDate,
+    sprintIssues.sprint.endDate
   );
+  const daysRemaining = businessDays(
+    startOfToday(),
+    sprintIssues.sprint.endDate
+  );
+  const allIssuesEstimateSum =
+    sprintIssues.contents.allIssuesEstimateSum.value || 0;
+  const completedIssuesInitialEstimateSum =
+    sprintIssues.contents.completedIssuesInitialEstimateSum.value || 0;
+  const estimateProgress =
+    allIssuesEstimateSum > 0
+      ? Math.round(
+          (completedIssuesInitialEstimateSum / allIssuesEstimateSum) * 100
+        )
+      : 0;
   const issuesInProgress = sprintIssues.contents.issuesNotCompletedInCurrentSprint.filter(
     issue => {
       return issue.status.name !== 'Open' && issue.status.name !== 'Blocked';
@@ -67,6 +80,15 @@ module.exports = async (args, options, { sourceMessage }) => {
   const issuesBlocked = sprintIssues.contents.issuesNotCompletedInCurrentSprint.filter(
     issue => issue.status.name === 'Blocked'
   );
+
+  const completedIssuesCount = sprintIssues.contents.completedIssues.length;
+  const notCompletedIssuesCount =
+    sprintIssues.contents.issuesNotCompletedInCurrentSprint.length;
+  const allIssueCount = completedIssuesCount + notCompletedIssuesCount;
+  const issuesProgress =
+    allIssueCount > 0
+      ? Math.round((completedIssuesCount / allIssueCount) * 100)
+      : 0;
 
   function issueToString(issue) {
     return `<${util.format(
@@ -86,13 +108,15 @@ module.exports = async (args, options, { sourceMessage }) => {
         color: slack.COLOR_INFO,
         fields: [
           {
-            title: 'Points done',
-            value: `${completedIssuesInitialEstimateSum}/${allIssuesEstimateSum} (${estimateProgress}%)`,
+            title: 'Progress',
+            value:
+              `*Issues:* ${completedIssuesCount}/${allIssueCount} (${issuesProgress}%)\n` +
+              `*Points:* ${completedIssuesInitialEstimateSum}/${allIssuesEstimateSum} (${estimateProgress}%)`,
             short: true,
           },
           {
             title: 'Days left',
-            value: daysRemaining,
+            value: `${daysRemaining} (of ${totalDays})`,
             short: true,
           },
         ],
