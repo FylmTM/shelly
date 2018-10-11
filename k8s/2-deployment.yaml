@@ -16,7 +16,7 @@ spec:
         app: shelly
     spec:
       containers:
-        - image: fylmtm/shelly:0.1.5
+        - image: fylmtm/shelly:0.1.6
           name: shelly
           env:
             - name: SLACK_TOKEN

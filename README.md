@@ -22,7 +22,7 @@ manage their work.
 ## Quickstart
 
 ```bash
-docker run -e SLACK_TOKEN="ac123" -v /localPath/app-config.js:/app/shelly-config.js fylmtm/shelly:0.1.5
+docker run -e SLACK_TOKEN="ac123" -v /localPath/app-config.js:/app/shelly-config.js fylmtm/shelly:0.1.6
 ```
 
 ## Configuration
