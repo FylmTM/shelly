@@ -10,7 +10,9 @@ class Commander {
         return {
           attachments: [
             {
-              text: 'TODO: help',
+              text: `*Unknown command*.\nAvailable commands:\n${configuration
+                .map(command => `- \`${command.command}\``)
+                .join('\n')}`,
               color: '#738694',
             },
           ],
