@@ -12,6 +12,8 @@ manage their work.
     - [ ] Burndown chart
     - [x] Blocked stories
     - [x] Stories in progress
+    - [x] Last updated time
+  - [ ] Ping when not updated >= n time
   - [ ] Bug status
 - Jenkins
   - [ ] Notify about failed build
